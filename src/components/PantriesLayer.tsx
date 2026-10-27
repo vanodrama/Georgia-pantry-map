@@ -11,7 +11,7 @@ interface PantriesLayerProps {
   area: FocusArea;
 }
 
-// Food pantry points from /food_pantries.geojson, with a popup on click.
+// Atlanta Community Food Bank partner locations from /food_pantries.geojson, with a popup on click.
 export function PantriesLayer({ map, area }: PantriesLayerProps) {
   useEffect(() => {
     map.addSource('pantries', { type: 'geojson', data: dataUrl('food_pantries.geojson') });
@@ -33,12 +33,14 @@ export function PantriesLayer({ map, area }: PantriesLayerProps) {
       if (!f || f.geometry.type !== 'Point') return;
       const p = f.properties ?? {};
       const el = document.createElement('div');
-      el.innerHTML = '<strong></strong><br/><span></span><br/><span></span><br/><span></span>';
-      const [name, addr, city, phone] = el.querySelectorAll('strong, span');
-      name.textContent = p.name;
-      addr.textContent = p.address;
-      city.textContent = p.city;
-      phone.textContent = p.phone ?? '';
+      const title = document.createElement('strong');
+      title.textContent = p.name;
+      el.append(title);
+      // Optional fields are left out when the food bank's list has them blank
+      const lines = [p.address, p.phone, p.programs && `Programs: ${p.programs}`, p.website];
+      for (const line of lines.filter(Boolean)) {
+        el.append(document.createElement('br'), String(line));
+      }
       popup.setLngLat(f.geometry.coordinates as [number, number]).setDOMContent(el).addTo(map);
     };
     const setPointer = () => (map.getCanvas().style.cursor = 'pointer');
