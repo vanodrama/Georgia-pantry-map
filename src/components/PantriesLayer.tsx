@@ -39,6 +39,7 @@ interface PantriesLayerProps {
   area: FocusArea;
   // Program types to show; a pantry is shown if it offers any of them
   types: string[];
+  visible: boolean;
 }
 
 // `programTypes` is a pipe-delimited list like "|Food Distribution|Shelter|", so membership is a substring test
@@ -57,7 +58,7 @@ function typeFilter(types: string[]): mapboxgl.ExpressionSpecification {
 }
 
 // Atlanta Community Food Bank partner locations from /food_pantries.geojson, with a popup on click.
-export function PantriesLayer({ map, area, types }: PantriesLayerProps) {
+export function PantriesLayer({ map, area, types, visible }: PantriesLayerProps) {
   useEffect(() => {
     map.addSource('pantries', { type: 'geojson', data: dataUrl('food_pantries.geojson') });
     map.addLayer({
@@ -116,7 +117,8 @@ export function PantriesLayer({ map, area, types }: PantriesLayerProps) {
 
   useEffect(() => {
     map.setFilter('pantries', ['all', ['==', ['get', area === 'atlanta' ? 'inAtlanta' : 'inGeorgia'], true], typeFilter(types)]);
-  }, [map, area, types]);
+    map.setLayoutProperty('pantries', 'visibility', visible ? 'visible' : 'none');
+  }, [map, area, types, visible]);
 
   return null;
 }

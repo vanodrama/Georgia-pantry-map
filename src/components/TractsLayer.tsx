@@ -105,10 +105,12 @@ export function TractsLayer({ map, measure }: TractsLayerProps) {
     const select = (geoid: string) =>
       map.getLayer('tracts-selected') && map.setFilter('tracts-selected', ['==', ['get', 'geoid'], geoid]);
     const popup = new mapboxgl.Popup();
-    popup.on('close', () => select(''));
+    const clearSelection = () => select('');
+    popup.on('close', clearSelection);
     const onClick = (e: mapboxgl.MapLayerMouseEvent) => {
-      // Pantry dots have their own popup
-      if (map.getLayer('pantries') && map.queryRenderedFeatures(e.point, { layers: ['pantries'] }).length) return;
+      // Pantry and retailer dots have their own popups
+      const pointLayers = ['pantries', 'retailers'].filter((id) => map.getLayer(id));
+      if (pointLayers.length && map.queryRenderedFeatures(e.point, { layers: pointLayers }).length) return;
       const p = e.features?.[0]?.properties;
       if (!p) return;
       const el = document.createElement('div');
@@ -128,6 +130,8 @@ export function TractsLayer({ map, measure }: TractsLayerProps) {
 
     return () => {
       map.off('click', 'tracts-fill', onClick);
+      // Detach first: on teardown the map may already be removed when the popup closes
+      popup.off('close', clearSelection);
       popup.remove();
     };
   }, [map, measure]);

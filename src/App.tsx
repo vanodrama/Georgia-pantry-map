@@ -4,12 +4,15 @@ import { CityOutline, OUTLINE_COLOR } from './components/CityOutline';
 import { AreaFocus, focusAreas, type FocusArea } from './components/AreaFocus';
 import { StateBoundaries, STATE_LINE_COLOR } from './components/StateBoundaries';
 import { PantriesLayer, PANTRY_COLOR, programTypes } from './components/PantriesLayer';
+import { RetailersLayer, RETAILER_RING } from './components/RetailersLayer';
 import { TractsLayer, tractRamp, tractMeasures } from './components/TractsLayer';
 
 export default function App() {
   const [measure, setMeasure] = useState(tractMeasures[0]);
   const [area, setArea] = useState<FocusArea>('georgia');
   const [types, setTypes] = useState<string[]>(programTypes);
+  const [showPantries, setShowPantries] = useState(true);
+  const [showRetailers, setShowRetailers] = useState(true);
   const toggleType = (t: string) =>
     setTypes((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : programTypes.filter((x) => x === t || cur.includes(x))));
   const b = measure.breaks;
@@ -25,7 +28,8 @@ export default function App() {
             <TractsLayer map={map} measure={measure} />
             <AreaFocus map={map} area={area} />
             <CityOutline map={map} />
-            <PantriesLayer map={map} area={area} types={types} />
+            <RetailersLayer map={map} area={area} visible={showRetailers} />
+            <PantriesLayer map={map} area={area} types={types} visible={showPantries} />
           </>
         )}
       </BaseMap>
@@ -37,9 +41,10 @@ export default function App() {
             </button>
           ))}
         </div>
-        <div className="legend-row">
+        <label className="legend-row layer-toggle">
+          <input id="show-pantries" type="checkbox" checked={showPantries} onChange={(e) => setShowPantries(e.target.checked)} />
           <span className="dot" style={{ background: PANTRY_COLOR }} /> Food pantries
-        </div>
+        </label>
         <details className="program-filter">
           <summary>
             Filter by program{types.length < programTypes.length ? ` (${types.length} of ${programTypes.length})` : ''}
@@ -55,6 +60,10 @@ export default function App() {
             </label>
           ))}
         </details>
+        <label className="legend-row layer-toggle">
+          <input id="show-retailers" type="checkbox" checked={showRetailers} onChange={(e) => setShowRetailers(e.target.checked)} />
+          <span className="dot ring" style={{ borderColor: RETAILER_RING }} /> Large retailers
+        </label>
         <div className="legend-row">
           <span className="dash" style={{ borderColor: OUTLINE_COLOR }} /> Atlanta city limits
         </div>
