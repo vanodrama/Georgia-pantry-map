@@ -16,3 +16,4 @@ body { font-family: system-ui, sans-serif; }
 .area-switch button { flex: 1; padding: 5px 10px; border: 0; background: #fff; font: inherit; cursor: pointer; }
 .area-switch button + button { border-left: 1px solid #ccc; }
 .area-switch button.active { background: #333; color: #fff; }
+.mapboxgl-popup-content { max-width: 280px; line-height: 1.45; }

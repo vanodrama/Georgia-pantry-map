@@ -5,6 +5,13 @@ import type { FocusArea } from './AreaFocus';
 
 export const PANTRY_COLOR = '#6a1b9a';
 
+interface Program {
+  name: string;
+  type: string;
+  contact: string;
+  phone: string;
+}
+
 interface PantriesLayerProps {
   map: mapboxgl.Map;
   // Only pantries inside the chosen area are shown (precomputed `inGeorgia` / `inAtlanta` flags)
@@ -37,7 +44,15 @@ export function PantriesLayer({ map, area }: PantriesLayerProps) {
       title.textContent = p.name;
       el.append(title);
       // Optional fields are left out when the food bank's list has them blank
-      const lines = [p.address, p.phone, p.programs && `Programs: ${p.programs}`, p.website];
+      const contact = [p.contact, p.phone].filter(Boolean).join(' · ');
+      const lines = [p.address, contact && `Contact: ${contact}`, p.website];
+      // Each program: "Name (type)", plus its own contact when it differs from the location's
+      const programs: Program[] = JSON.parse(p.programs || '[]');
+      for (const prog of programs) {
+        const label = [prog.name, prog.type && `(${prog.type})`].filter(Boolean).join(' ');
+        const own = [prog.contact !== p.contact && prog.contact, prog.phone !== p.phone && prog.phone].filter(Boolean).join(' · ');
+        lines.push(`Program: ${label}${own ? ` · ${own}` : ''}`);
+      }
       for (const line of lines.filter(Boolean)) {
         el.append(document.createElement('br'), String(line));
       }
