@@ -5,6 +5,7 @@ Interactive map of food pantries and census-tract food access measures for Georg
 **Layers**
 - Atlanta Community Food Bank partner pantries (geocoded with the ArcGIS World Geocoder)
 - Large grocery retailers (Publix, Walmart, Kroger, ALDI, Piggly Wiggly, Food Lion)
+- SNAP-authorized stores in Georgia (USDA SNAP Retailer Locator data), filterable by store type
 - Census tracts shaded by: food insecurity and food stamp receipt (CDC PLACES 2025), low access to large retailers (USDA Food Access Research Atlas, 2010 tracts), and low access to SNAP-authorized retailers (USDA SNAP-authorized Retailer Access Map)
 - Atlanta city limits, Georgia state boundary and tract boundaries (US Census TIGERweb)
 

@@ -4,7 +4,7 @@ import { CityOutline, OUTLINE_COLOR } from './components/CityOutline';
 import { AreaFocus, focusAreas, type FocusArea } from './components/AreaFocus';
 import { StateBoundaries, STATE_LINE_COLOR } from './components/StateBoundaries';
 import { PantriesLayer, PANTRY_COLOR, programTypes } from './components/PantriesLayer';
-import { RetailersLayer, RETAILER_RING } from './components/RetailersLayer';
+import { StoresLayer, largeRetailers, snapRetailers, snapStoreTypes, SNAP_COLOR } from './components/StoresLayer';
 import { TractsLayer, tractRamp, tractMeasures } from './components/TractsLayer';
 
 export default function App() {
@@ -13,6 +13,10 @@ export default function App() {
   const [types, setTypes] = useState<string[]>(programTypes);
   const [showPantries, setShowPantries] = useState(true);
   const [showRetailers, setShowRetailers] = useState(true);
+  const [showSnap, setShowSnap] = useState(true);
+  const [snapTypes, setSnapTypes] = useState<string[]>(snapStoreTypes);
+  const toggleSnapType = (t: string) =>
+    setSnapTypes((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : snapStoreTypes.filter((x) => x === t || cur.includes(x))));
   const toggleType = (t: string) =>
     setTypes((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : programTypes.filter((x) => x === t || cur.includes(x))));
   const b = measure.breaks;
@@ -28,7 +32,8 @@ export default function App() {
             <TractsLayer map={map} measure={measure} />
             <AreaFocus map={map} area={area} />
             <CityOutline map={map} />
-            <RetailersLayer map={map} area={area} visible={showRetailers} />
+            <StoresLayer map={map} config={snapRetailers} area={area} visible={showSnap} types={snapTypes} />
+            <StoresLayer map={map} config={largeRetailers} area={area} visible={showRetailers} />
             <PantriesLayer map={map} area={area} types={types} visible={showPantries} />
           </>
         )}
@@ -62,8 +67,27 @@ export default function App() {
         </details>
         <label className="legend-row layer-toggle">
           <input id="show-retailers" type="checkbox" checked={showRetailers} onChange={(e) => setShowRetailers(e.target.checked)} />
-          <span className="dot ring" style={{ borderColor: RETAILER_RING }} /> Large retailers
+          <span className="dot ring" /> Large retailers
         </label>
+        <label className="legend-row layer-toggle">
+          <input id="show-snap" type="checkbox" checked={showSnap} onChange={(e) => setShowSnap(e.target.checked)} />
+          <span className="dot small" style={{ background: SNAP_COLOR }} /> SNAP-authorized stores
+        </label>
+        <details className="program-filter">
+          <summary>
+            Filter by store type{snapTypes.length < snapStoreTypes.length ? ` (${snapTypes.length} of ${snapStoreTypes.length})` : ''}
+          </summary>
+          <div className="filter-actions">
+            <button type="button" onClick={() => setSnapTypes(snapStoreTypes)}>All</button>
+            <button type="button" onClick={() => setSnapTypes([])}>None</button>
+          </div>
+          {snapStoreTypes.map((t) => (
+            <label key={t} className="filter-option">
+              <input id={`snap-${t}`} type="checkbox" checked={snapTypes.includes(t)} onChange={() => toggleSnapType(t)} />
+              {t}
+            </label>
+          ))}
+        </details>
         <div className="legend-row">
           <span className="dash" style={{ borderColor: OUTLINE_COLOR }} /> Atlanta city limits
         </div>

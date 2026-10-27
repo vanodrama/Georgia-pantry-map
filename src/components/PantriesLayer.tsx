@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { dataUrl } from '../config';
 import mapboxgl from 'mapbox-gl';
 import type { FocusArea } from './AreaFocus';
+import { featuresNear } from './StoresLayer';
 
 export const PANTRY_COLOR = '#6a1b9a';
 
@@ -74,8 +75,8 @@ export function PantriesLayer({ map, area, types, visible }: PantriesLayerProps)
     });
 
     const popup = new mapboxgl.Popup({ offset: 8 });
-    const onClick = (e: mapboxgl.MapLayerMouseEvent) => {
-      const f = e.features?.[0];
+    const onClick = (e: mapboxgl.MapMouseEvent) => {
+      const f = featuresNear(map, e.point, ['pantries'])[0];
       if (!f || f.geometry.type !== 'Point') return;
       const p = f.properties ?? {};
       const el = document.createElement('div');
@@ -99,12 +100,12 @@ export function PantriesLayer({ map, area, types, visible }: PantriesLayerProps)
     };
     const setPointer = () => (map.getCanvas().style.cursor = 'pointer');
     const clearPointer = () => (map.getCanvas().style.cursor = '');
-    map.on('click', 'pantries', onClick);
+    map.on('click', onClick);
     map.on('mouseenter', 'pantries', setPointer);
     map.on('mouseleave', 'pantries', clearPointer);
 
     return () => {
-      map.off('click', 'pantries', onClick);
+      map.off('click', onClick);
       map.off('mouseenter', 'pantries', setPointer);
       map.off('mouseleave', 'pantries', clearPointer);
       popup.remove();

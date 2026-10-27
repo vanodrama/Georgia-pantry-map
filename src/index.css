@@ -26,4 +26,5 @@ body { font-family: system-ui, sans-serif; }
 .filter-option input { margin: 1px 0 0; }
 .layer-toggle { cursor: pointer; }
 .layer-toggle input { margin: 0; }
-.legend .dot.ring { background: #fff; border: 2px solid; box-shadow: none; width: 10px; height: 10px; }
+.legend .dot.ring { background: #fff; border: 2px solid #1b1b1b; box-shadow: none; width: 10px; height: 10px; }
+.legend .dot.small { width: 8px; height: 8px; margin: 0 2px; }

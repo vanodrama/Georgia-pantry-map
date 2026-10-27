@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { dataUrl } from '../config';
 import mapboxgl from 'mapbox-gl';
+import { featuresNear, pointLayerIds } from './StoresLayer';
 
 // PLACES and SNAP-retailer access use 2020 tracts; the large-retailer Atlas uses 2010 tracts
 const datasets = {
@@ -109,8 +110,7 @@ export function TractsLayer({ map, measure }: TractsLayerProps) {
     popup.on('close', clearSelection);
     const onClick = (e: mapboxgl.MapLayerMouseEvent) => {
       // Pantry and retailer dots have their own popups
-      const pointLayers = ['pantries', 'retailers'].filter((id) => map.getLayer(id));
-      if (pointLayers.length && map.queryRenderedFeatures(e.point, { layers: pointLayers }).length) return;
+      if (featuresNear(map, e.point, pointLayerIds).length) return;
       const p = e.features?.[0]?.properties;
       if (!p) return;
       const el = document.createElement('div');
