@@ -3,12 +3,15 @@ import { BaseMap } from './components/BaseMap';
 import { CityOutline, OUTLINE_COLOR } from './components/CityOutline';
 import { AreaFocus, focusAreas, type FocusArea } from './components/AreaFocus';
 import { StateBoundaries, STATE_LINE_COLOR } from './components/StateBoundaries';
-import { PantriesLayer, PANTRY_COLOR } from './components/PantriesLayer';
+import { PantriesLayer, PANTRY_COLOR, programTypes } from './components/PantriesLayer';
 import { TractsLayer, tractRamp, tractMeasures } from './components/TractsLayer';
 
 export default function App() {
   const [measure, setMeasure] = useState(tractMeasures[0]);
   const [area, setArea] = useState<FocusArea>('georgia');
+  const [types, setTypes] = useState<string[]>(programTypes);
+  const toggleType = (t: string) =>
+    setTypes((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : programTypes.filter((x) => x === t || cur.includes(x))));
   const b = measure.breaks;
   const classLabels = [`< ${b[0]}%`, ...b.slice(1).map((v, i) => `${b[i]} – ${v}%`), `≥ ${b[b.length - 1]}%`];
 
@@ -22,7 +25,7 @@ export default function App() {
             <TractsLayer map={map} measure={measure} />
             <AreaFocus map={map} area={area} />
             <CityOutline map={map} />
-            <PantriesLayer map={map} area={area} />
+            <PantriesLayer map={map} area={area} types={types} />
           </>
         )}
       </BaseMap>
@@ -37,6 +40,21 @@ export default function App() {
         <div className="legend-row">
           <span className="dot" style={{ background: PANTRY_COLOR }} /> Food pantries
         </div>
+        <details className="program-filter">
+          <summary>
+            Filter by program{types.length < programTypes.length ? ` (${types.length} of ${programTypes.length})` : ''}
+          </summary>
+          <div className="filter-actions">
+            <button type="button" onClick={() => setTypes(programTypes)}>All</button>
+            <button type="button" onClick={() => setTypes([])}>None</button>
+          </div>
+          {programTypes.map((t) => (
+            <label key={t || 'none'} className="filter-option">
+              <input id={`program-${t || 'none'}`} type="checkbox" checked={types.includes(t)} onChange={() => toggleType(t)} />
+              {t || 'No type listed'}
+            </label>
+          ))}
+        </details>
         <div className="legend-row">
           <span className="dash" style={{ borderColor: OUTLINE_COLOR }} /> Atlanta city limits
         </div>

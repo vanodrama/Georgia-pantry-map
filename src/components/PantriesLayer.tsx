@@ -12,14 +12,52 @@ interface Program {
   phone: string;
 }
 
+// Program types in the food bank's list, most common first; '' is pantries with none listed
+export const programTypes = [
+  'Food Distribution',
+  'Pop-Up/Mobile Resource',
+  'Hot/Cold Meal Program',
+  'Distribution of Non-Food Items',
+  'Programs-Oasis',
+  'Programs-Public Benefits Assistance',
+  'Health and Wellness Services',
+  'Case Management Services',
+  'Educational Courses/Classes',
+  'Tax/Financial Support',
+  'Legal Assistance',
+  'Healthcare Screenings/Referrals',
+  'Mental Health Services',
+  'Employment Services/Workforce Development',
+  'Shelter',
+  'Other',
+  '',
+];
+
 interface PantriesLayerProps {
   map: mapboxgl.Map;
   // Only pantries inside the chosen area are shown (precomputed `inGeorgia` / `inAtlanta` flags)
   area: FocusArea;
+  // Program types to show; a pantry is shown if it offers any of them
+  types: string[];
+}
+
+// `programTypes` is a pipe-delimited list like "|Food Distribution|Shelter|", so membership is a substring test
+function typeFilter(types: string[]): mapboxgl.ExpressionSpecification {
+  // Written so Mapbox can't mistake them for its legacy filter syntax (e.g. ["in", key, ...values])
+  // Matches nothing: no pantry has this value
+  if (types.length === 0) return ['==', ['get', 'programTypes'], '#none#'];
+  return [
+    'any',
+    ...types.map((t): mapboxgl.ExpressionSpecification =>
+      t === ''
+        ? ['==', ['get', 'programTypes'], '']
+        : ['>=', ['index-of', `|${t}|`, ['get', 'programTypes']], 0],
+    ),
+  ];
 }
 
 // Atlanta Community Food Bank partner locations from /food_pantries.geojson, with a popup on click.
-export function PantriesLayer({ map, area }: PantriesLayerProps) {
+export function PantriesLayer({ map, area, types }: PantriesLayerProps) {
   useEffect(() => {
     map.addSource('pantries', { type: 'geojson', data: dataUrl('food_pantries.geojson') });
     map.addLayer({
@@ -77,8 +115,8 @@ export function PantriesLayer({ map, area }: PantriesLayerProps) {
   }, [map]);
 
   useEffect(() => {
-    map.setFilter('pantries', ['==', ['get', area === 'atlanta' ? 'inAtlanta' : 'inGeorgia'], true]);
-  }, [map, area]);
+    map.setFilter('pantries', ['all', ['==', ['get', area === 'atlanta' ? 'inAtlanta' : 'inGeorgia'], true], typeFilter(types)]);
+  }, [map, area, types]);
 
   return null;
 }

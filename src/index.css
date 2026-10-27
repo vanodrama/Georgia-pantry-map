@@ -17,3 +17,10 @@ body { font-family: system-ui, sans-serif; }
 .area-switch button + button { border-left: 1px solid #ccc; }
 .area-switch button.active { background: #333; color: #fff; }
 .mapboxgl-popup-content { max-width: 280px; line-height: 1.45; }
+.legend { max-height: calc(100% - 24px); overflow-y: auto; max-width: 260px; box-sizing: border-box; }
+.program-filter { margin: 2px 0 6px 20px; font-size: 13px; }
+.program-filter summary { cursor: pointer; color: #333; }
+.filter-actions { display: flex; gap: 6px; margin: 6px 0 4px; }
+.filter-actions button { font: inherit; font-size: 12px; padding: 2px 8px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; }
+.filter-option { display: flex; align-items: flex-start; gap: 6px; margin: 2px 0; line-height: 1.3; cursor: pointer; }
+.filter-option input { margin: 1px 0 0; }
