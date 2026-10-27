@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { dataUrl } from '../config';
 import mapboxgl from 'mapbox-gl';
 import { featuresNear, pointLayerIds } from './StoresLayer';
+import type { FocusArea } from './AreaFocus';
 
 // PLACES and SNAP-retailer access use 2020 tracts; the large-retailer Atlas uses 2010 tracts
 const datasets = {
@@ -38,6 +39,8 @@ export const tractRamp = ['#1a9850', '#91cf60', '#ffffbf', '#fc8d59', '#d73027']
 interface TractsLayerProps {
   map: mapboxgl.Map;
   measure: MeasureOption;
+  // In Atlanta view only tracts overlapping the city (precomputed `inAtlanta` flag) respond to clicks
+  area: FocusArea;
 }
 
 function fillColor({ key, breaks }: MeasureOption): mapboxgl.ExpressionSpecification {
@@ -67,7 +70,7 @@ function popupLines(dataset: Dataset, p: Record<string, unknown>): string[] {
 }
 
 // Census-tract measures shaded green (low) through light yellow to red (high), drawn under the basemap labels.
-export function TractsLayer({ map, measure }: TractsLayerProps) {
+export function TractsLayer({ map, measure, area }: TractsLayerProps) {
   useEffect(() => {
     const firstLabel = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
     map.addSource('tracts', { type: 'geojson', data: datasets[measure.dataset] });
@@ -112,7 +115,7 @@ export function TractsLayer({ map, measure }: TractsLayerProps) {
       // Pantry and retailer dots have their own popups
       if (featuresNear(map, e.point, pointLayerIds).length) return;
       const p = e.features?.[0]?.properties;
-      if (!p) return;
+      if (!p || (area === 'atlanta' && !p.inAtlanta)) return;
       const el = document.createElement('div');
       const title = document.createElement('strong');
       title.textContent = `Tract ${p.geoid} (${p.county} County)`;
@@ -134,7 +137,7 @@ export function TractsLayer({ map, measure }: TractsLayerProps) {
       popup.off('close', clearSelection);
       popup.remove();
     };
-  }, [map, measure]);
+  }, [map, measure, area]);
 
   useEffect(() => {
     (map.getSource('tracts') as mapboxgl.GeoJSONSource).setData(datasets[measure.dataset]);

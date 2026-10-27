@@ -1,8 +1,9 @@
 import type { LngLatLike } from 'mapbox-gl';
 
 export const mapConfig = {
-  center: [-84.388, 33.749] as LngLatLike,
-  zoom: 10.3,
+  // Opens on the Atlanta view, centred on the city limits
+  center: [-84.42, 33.768] as LngLatLike,
+  zoom: 10.6,
   style: 'mapbox://styles/mapbox/streets-v12',
 };
 

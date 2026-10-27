@@ -18,8 +18,10 @@ interface AreaFocusProps {
 // Layers added after this one (city outline, pantry dots) stay fully visible on top.
 export function AreaFocus({ map, area }: AreaFocusProps) {
   useEffect(() => {
-    map.addSource('outside-area', { type: 'geojson', data: focusAreas[0].mask });
-    map.addSource('area', { type: 'geojson', data: focusAreas[0].outline });
+    // Start with the area the app opens in; later switches go through setData below
+    const start = focusAreas.find((f) => f.key === area) ?? focusAreas[0];
+    map.addSource('outside-area', { type: 'geojson', data: start.mask });
+    map.addSource('area', { type: 'geojson', data: start.outline });
     map.addLayer({
       id: 'outside-area-mask',
       type: 'fill',
@@ -41,6 +43,7 @@ export function AreaFocus({ map, area }: AreaFocusProps) {
         map.removeSource('outside-area');
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
   const shownArea = useRef(area);

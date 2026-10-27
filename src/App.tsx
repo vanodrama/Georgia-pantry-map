@@ -9,7 +9,7 @@ import { TractsLayer, tractRamp, tractMeasures } from './components/TractsLayer'
 
 export default function App() {
   const [measure, setMeasure] = useState(tractMeasures[0]);
-  const [area, setArea] = useState<FocusArea>('georgia');
+  const [area, setArea] = useState<FocusArea>('atlanta');
   const [types, setTypes] = useState<string[]>(programTypes);
   const [showPantries, setShowPantries] = useState(true);
   const [showRetailers, setShowRetailers] = useState(true);
@@ -29,7 +29,7 @@ export default function App() {
         {(map) => (
           <>
             <StateBoundaries map={map} />
-            <TractsLayer map={map} measure={measure} />
+            <TractsLayer map={map} measure={measure} area={area} />
             <AreaFocus map={map} area={area} />
             <CityOutline map={map} />
             <StoresLayer map={map} config={snapRetailers} area={area} visible={showSnap} types={snapTypes} />
