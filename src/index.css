@@ -1,0 +1,18 @@
+html, body, #root { height: 100%; margin: 0; }
+body { font-family: system-ui, sans-serif; }
+.map { width: 100%; height: 100%; }
+.missing-token { padding: 24px; line-height: 1.5; }
+.legend { position: absolute; top: 12px; left: 12px; background: #fff; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.25); font-size: 14px; }
+.legend-row { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+.legend .dash { width: 14px; border-top: 2.5px dashed; }
+.legend .dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #fff; box-shadow: 0 0 0 1px #999; }
+.legend .line { width: 14px; border-top: 1.5px solid; }
+.legend-section { margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
+.legend-section select { font: inherit; margin-bottom: 4px; }
+.legend .swatch { width: 14px; height: 12px; opacity: 0.8; }
+.legend-note { font-size: 11px; color: #666; margin-top: 4px; }
+.legend-note { max-width: 220px; }
+.area-switch { display: flex; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }
+.area-switch button { flex: 1; padding: 5px 10px; border: 0; background: #fff; font: inherit; cursor: pointer; }
+.area-switch button + button { border-left: 1px solid #ccc; }
+.area-switch button.active { background: #333; color: #fff; }

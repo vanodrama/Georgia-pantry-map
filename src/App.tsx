@@ -1,0 +1,62 @@
+import { useState } from 'react';
+import { BaseMap } from './components/BaseMap';
+import { CityOutline, OUTLINE_COLOR } from './components/CityOutline';
+import { AreaFocus, focusAreas, type FocusArea } from './components/AreaFocus';
+import { StateBoundaries, STATE_LINE_COLOR } from './components/StateBoundaries';
+import { PantriesLayer, PANTRY_COLOR } from './components/PantriesLayer';
+import { TractsLayer, tractRamp, tractMeasures } from './components/TractsLayer';
+
+export default function App() {
+  const [measure, setMeasure] = useState(tractMeasures[0]);
+  const [area, setArea] = useState<FocusArea>('georgia');
+  const b = measure.breaks;
+  const classLabels = [`< ${b[0]}%`, ...b.slice(1).map((v, i) => `${b[i]} – ${v}%`), `≥ ${b[b.length - 1]}%`];
+
+  return (
+    <>
+      {/* Order matters: tracts sit under labels, the grey mask covers everything outside the chosen area, outline and pantry dots draw on top */}
+      <BaseMap>
+        {(map) => (
+          <>
+            <StateBoundaries map={map} />
+            <TractsLayer map={map} measure={measure} />
+            <AreaFocus map={map} area={area} />
+            <CityOutline map={map} />
+            <PantriesLayer map={map} area={area} />
+          </>
+        )}
+      </BaseMap>
+      <div className="legend">
+        <div className="area-switch" role="group" aria-label="Show area">
+          {focusAreas.map((a) => (
+            <button key={a.key} className={a.key === area ? 'active' : ''} aria-pressed={a.key === area} onClick={() => setArea(a.key)}>
+              {a.label}
+            </button>
+          ))}
+        </div>
+        <div className="legend-row">
+          <span className="dot" style={{ background: PANTRY_COLOR }} /> Food pantries
+        </div>
+        <div className="legend-row">
+          <span className="dash" style={{ borderColor: OUTLINE_COLOR }} /> Atlanta city limits
+        </div>
+        <div className="legend-row">
+          <span className="line" style={{ borderColor: STATE_LINE_COLOR }} /> State boundaries
+        </div>
+        <div className="legend-section">
+          <select value={measure.key} onChange={(e) => setMeasure(tractMeasures.find((m) => m.key === e.target.value) ?? tractMeasures[0])}>
+            {tractMeasures.map((m) => (
+              <option key={m.key} value={m.key}>{m.label}</option>
+            ))}
+          </select>
+          {classLabels.map((l, i) => (
+            <div key={l} className="legend-row">
+              <span className="swatch" style={{ background: tractRamp[i] }} /> {l}
+            </div>
+          ))}
+          <div className="legend-note">{measure.note}</div>
+        </div>
+      </div>
+    </>
+  );
+}
